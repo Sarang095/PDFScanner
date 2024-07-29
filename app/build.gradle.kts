@@ -8,12 +8,18 @@ android {
 
     defaultConfig {
         applicationId = "com.example.pdfscanner"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    packagingOptions {
+        resources {
+            excludes.add("META-INF/DEPENDENCIES")
+        }
     }
 
     buildTypes {
@@ -40,4 +46,10 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+    implementation (libs.apache.poi.ooxml)
+    implementation (libs.pdfbox)
+    implementation (libs.itext7.core)
+
+
 }
