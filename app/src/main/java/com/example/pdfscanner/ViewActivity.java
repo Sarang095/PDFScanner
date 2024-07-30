@@ -27,9 +27,19 @@ import com.itextpdf.layout.element.Paragraph;
 
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFRun;
+
+
+import com.tom_roush.pdfbox.android.PDFBoxResourceLoader;
+import com.tom_roush.pdfbox.pdmodel.PDDocument;
+import com.tom_roush.pdfbox.pdmodel.PDPage;
+
+import com.tom_roush.pdfbox.text.PDFTextStripper;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -38,6 +48,7 @@ public class ViewActivity extends AppCompatActivity {
 
     private Uri uri;
     private String mime;
+    private int code;
     private ImageView imageView;
 
     @Override
@@ -48,9 +59,12 @@ public class ViewActivity extends AppCompatActivity {
 
         uri = getIntent().getParcelableExtra("URI");
         mime = getIntent().getStringExtra("mimeType");
+        code = getIntent().getIntExtra("code", 0);
         imageView = findViewById(R.id.image_view);
         Button download = findViewById(R.id.download);
         TextView pdfView = findViewById(R.id.pdf_view);
+
+
 
         try {
             InputStream inputStream = getContentResolver().openInputStream(uri);
@@ -64,27 +78,63 @@ public class ViewActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String extractedText = null;
-                try {
-                    extractedText = extractText(uri);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                try {
-                    Uri pdfUri = convertWordToPdf(extractedText);
-                    downloadPdf(pdfUri);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+
+                switch (code) {
+                    case 3:
+                        try {
+                            extractedText = extractTextWord(uri);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        try {
+                            Uri pdfUri = convertWordToPdf(extractedText);
+                            downloadPdf(pdfUri);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        break;
+
+                    case 5:
+                        try {
+                            extractedText = extractTextPdf(uri);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        try {
+                            Uri wordUri = pdftoWord(extractedText);
+                            downloadWord(wordUri);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        break;
                 }
             }
         });
     }
 
-    private String extractText(Uri uri) throws IOException {
+    private String extractTextWord(Uri uri) throws IOException {
         ContentResolver contentResolver = getContentResolver();
         try (InputStream inputStream = contentResolver.openInputStream(uri)) {
             XWPFDocument document = new XWPFDocument(inputStream);
             XWPFWordExtractor extractor = new XWPFWordExtractor(document);
             return extractor.getText();
+        }
+    }
+
+    private String extractTextPdf(Uri uri) throws IOException {
+        ContentResolver contentResolver = getContentResolver();
+        try (InputStream inputStream = contentResolver.openInputStream(uri)) {
+            PDFBoxResourceLoader.init(getApplicationContext()); // Initialize PDFBoxResourceLoader
+            PDDocument document = PDDocument.load(inputStream); //
+            StringBuilder text = new StringBuilder();
+            int pageCount = document.getNumberOfPages();
+            for (int i = 0; i < pageCount; i++) {
+                PDPage page = document.getPage(i);
+                PDFTextStripper stripper = new PDFTextStripper();
+                text.append(stripper.getText(document));
+            }
+            document.close();
+            return text.toString();
         }
     }
 
@@ -140,5 +190,59 @@ public class ViewActivity extends AppCompatActivity {
         intent.setDataAndType(pdfUri, "application/pdf");
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         startActivity(Intent.createChooser(intent, "Download PDF using"));
+    }
+
+    private Uri pdftoWord(String text) throws IOException {
+        File wordFile = new File(getFilesDir(), "NewDocument.docx");
+
+        try (XWPFDocument document = new XWPFDocument()) {
+            String[] lines = text.split("\n");
+
+            for (String line : lines) {
+                XWPFParagraph paragraph = document.createParagraph();
+                XWPFRun run = paragraph.createRun();
+                run.setText(line);
+            }
+
+            try (OutputStream outputStream = new FileOutputStream(wordFile)) {
+                document.write(outputStream);
+            }
+        }
+
+        return saveWordToMediaStore(wordFile);
+    }
+
+    private Uri saveWordToMediaStore(File wordFile) throws IOException {
+        ContentResolver contentResolver = getContentResolver();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, "NewDocument.docx");
+        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOCUMENTS);
+
+        Uri wordUri = contentResolver.insert(MediaStore.Files.getContentUri("external"), contentValues);
+
+        if (wordUri != null) {
+            try (OutputStream out = contentResolver.openOutputStream(wordUri);
+                 FileInputStream in = new FileInputStream(wordFile)) {
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, bytesRead);
+                }
+            } catch (IOException e) {
+                throw new IOException("Error writing to output stream", e);
+            }
+        } else {
+            throw new IOException("Failed to create new MediaStore entry");
+        }
+
+        return wordUri;
+    }
+
+    private void downloadWord(Uri wordUri) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(wordUri, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(Intent.createChooser(intent, "Download Word using"));
     }
 }

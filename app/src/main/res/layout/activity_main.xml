@@ -9,18 +9,18 @@
 
 
     <Button
-        android:id="@+id/scan"
+        android:id="@+id/upload_pdf"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="Scan"/>
+        android:text="Upload PDF"/>
 
     <Button
         android:id="@+id/image_to_pdf"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_below="@+id/scan"
+        android:layout_below="@+id/upload_pdf"
         android:text="Upload Image"/>
 
     <Button

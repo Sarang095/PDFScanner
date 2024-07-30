@@ -8,8 +8,8 @@ appcompat = "1.7.0"
 material = "1.12.0"
 activity = "1.9.0"
 constraintlayout = "2.1.4"
-pdfbox = "3.0.2"
 poiOoxmlVersion = "5.2.3"
+pdfboxAndroid = "2.0.27.0"
 
 [libraries]
 apache-poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "poiOoxmlVersion" }
@@ -21,8 +21,7 @@ appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "a
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
-pdfbox = { module = "org.apache.pdfbox:pdfbox", version.ref = "pdfbox" }
+pdfbox_android = { module = "com.tom-roush:pdfbox-android", version.ref = "pdfboxAndroid" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-

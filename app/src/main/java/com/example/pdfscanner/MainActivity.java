@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int UPLOAD_IMG_CODE = 2;
     private static final int UPLOAD_WORD_CODE = 3;
     private static final int IMAGE_CAPTURE_CODE = 4;
+    private static final int UPLOAD_PDF_CODE =5;
 
     private int currentRequestCode;
     private String currentMimeType;
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         Button ImgToPdf = findViewById(R.id.image_to_pdf);
         Button WordToPdf = findViewById(R.id.word_to_pdf);
         Button capture = findViewById(R.id.capture);
+        Button PDFtoWord =  findViewById(R.id.upload_pdf);
 
         ImgToPdf.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,6 +60,14 @@ public class MainActivity extends AppCompatActivity {
                 permissions(IMAGE_CAPTURE_CODE, "image/jpeg");
             }
         });
+
+        PDFtoWord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                permissions(UPLOAD_PDF_CODE, "application/pdf");
+            }
+        });
+
     }
 
     public void permissions(int code, String mime) {
@@ -121,6 +131,9 @@ public class MainActivity extends AppCompatActivity {
             case IMAGE_CAPTURE_CODE:
                 openCamera();
                 break;
+            case UPLOAD_PDF_CODE:
+                openFilePicker(code, mime);
+                break;
         }
     }
 
@@ -145,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if ((requestCode == IMAGE_CAPTURE_CODE || requestCode == UPLOAD_IMG_CODE || requestCode == UPLOAD_WORD_CODE) && resultCode == RESULT_OK) {
+        if ((requestCode == IMAGE_CAPTURE_CODE || requestCode == UPLOAD_IMG_CODE || requestCode == UPLOAD_WORD_CODE || requestCode == UPLOAD_PDF_CODE) && resultCode == RESULT_OK) {
             Uri uri = null;
             if (requestCode == IMAGE_CAPTURE_CODE) {
                 uri = imageUri;
@@ -157,19 +170,28 @@ public class MainActivity extends AppCompatActivity {
                     case UPLOAD_WORD_CODE:
                         Intent wordDoc = new Intent(this, ViewActivity.class);
                         wordDoc.putExtra("URI", uri);
+                        wordDoc.putExtra("code", UPLOAD_WORD_CODE);
                         wordDoc.putExtra("mimeType", currentMimeType);
                         startActivity(wordDoc);
                         break;
                     case UPLOAD_IMG_CODE:
                         Intent img = new Intent(this, ViewActivity.class);
                         img.putExtra("URI", uri);
+                        img.putExtra("code", UPLOAD_IMG_CODE);
                         img.putExtra("mimeType", currentMimeType);
                         startActivity(img);
                         break;
                     case IMAGE_CAPTURE_CODE:
                         Intent camera = new Intent(this, ViewActivity.class);
                         camera.putExtra("URI", uri);
+                        camera.putExtra("code", IMAGE_CAPTURE_CODE);
                         startActivity(camera);
+                        break;
+                    case UPLOAD_PDF_CODE:
+                        Intent pdf = new Intent(this, ViewActivity.class);
+                        pdf.putExtra("URI", uri);
+                        pdf.putExtra("code", UPLOAD_PDF_CODE);
+                        startActivity(pdf);
                         break;
                 }
             }

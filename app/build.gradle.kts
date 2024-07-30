@@ -19,6 +19,10 @@ android {
     packagingOptions {
         resources {
             excludes.add("META-INF/DEPENDENCIES")
+            excludes.add("META-INF/LICENSE")
+            excludes.add("META-INF/LICENSE-FIREBASE.txt")
+            excludes.add("META-INF/NOTICE")
+            excludes.add("META-INF/ASL2.0")
         }
     }
 
@@ -31,6 +35,7 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -38,7 +43,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -47,9 +51,18 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
-    implementation (libs.apache.poi.ooxml)
-    implementation (libs.pdfbox)
-    implementation (libs.itext7.core)
+    implementation(libs.apache.poi.ooxml)
+    implementation(libs.itext7.core)
 
+    // Exclude conflicting Bouncy Castle modules from pdfbox.android
+    implementation(libs.pdfbox.android) {
+        exclude(group = "org.bouncycastle", module = "bcprov-jdk15to18")
+        exclude(group = "org.bouncycastle", module = "bcpkix-jdk15to18")
+        exclude(group = "org.bouncycastle", module = "bcutil-jdk15to18")
+    }
 
+    // Include specific Bouncy Castle versions if needed
+    implementation("org.bouncycastle:bcprov-jdk18on:1.75")
+    implementation("org.bouncycastle:bcpkix-jdk18on:1.75")
+    implementation("org.bouncycastle:bcutil-jdk18on:1.75")
 }
