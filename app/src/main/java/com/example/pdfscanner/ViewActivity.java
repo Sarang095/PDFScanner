@@ -113,11 +113,11 @@ public class ViewActivity extends AppCompatActivity {
     }
 
     private String extractTextWord(Uri uri) throws IOException {
-        ContentResolver contentResolver = getContentResolver();
-        try (InputStream inputStream = contentResolver.openInputStream(uri)) {
+        ContentResolver contentResolver = getContentResolver(); // declaring teh content resolver instance to perform the "get" action
+        try (InputStream inputStream = contentResolver.openInputStream(uri)) {  // taking the word document from the uri with the help of the inputstream and the contentResolver
             XWPFDocument document = new XWPFDocument(inputStream);
-            XWPFWordExtractor extractor = new XWPFWordExtractor(document);
-            return extractor.getText();
+            XWPFWordExtractor extractor = new XWPFWordExtractor(document); //using the XWPFWordExtractor for the extracting the text from the word doc
+            return extractor.getText(); //converting the extracted text into string.
         }
     }
 
@@ -130,7 +130,7 @@ public class ViewActivity extends AppCompatActivity {
             int pageCount = document.getNumberOfPages();
             for (int i = 0; i < pageCount; i++) {
                 PDPage page = document.getPage(i);
-                PDFTextStripper stripper = new PDFTextStripper();
+                PDFTextStripper stripper = new PDFTextStripper(); //Used the PDFTextStripper to extract the text form the pdf
                 text.append(stripper.getText(document));
             }
             document.close();
@@ -193,10 +193,10 @@ public class ViewActivity extends AppCompatActivity {
     }
 
     private Uri pdftoWord(String text) throws IOException {
-        File wordFile = new File(getFilesDir(), "NewDocument.docx");
+        File wordFile = new File(getFilesDir(), "NewDocument.docx"); //first we created the word file in mobile's internal storage
 
-        try (XWPFDocument document = new XWPFDocument()) {
-            String[] lines = text.split("\n");
+        try (XWPFDocument document = new XWPFDocument()) {  //created a word document to perform the actions
+            String[] lines = text.split("\n");  // then we declared a string array and added the splitted text in multiple lines
 
             for (String line : lines) {
                 XWPFParagraph paragraph = document.createParagraph();
@@ -204,8 +204,8 @@ public class ViewActivity extends AppCompatActivity {
                 run.setText(line);
             }
 
-            try (OutputStream outputStream = new FileOutputStream(wordFile)) {
-                document.write(outputStream);
+            try (OutputStream outputStream = new FileOutputStream(wordFile)) {  //now
+                document.write(outputStream); //used the output stream to write those lines to a wordFile.
             }
         }
 
@@ -214,7 +214,7 @@ public class ViewActivity extends AppCompatActivity {
 
     private Uri saveWordToMediaStore(File wordFile) throws IOException {
         ContentResolver contentResolver = getContentResolver();
-        ContentValues contentValues = new ContentValues();
+        ContentValues contentValues = new ContentValues(); //used the content values to label those file in the internal filesystem
         contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, "NewDocument.docx");
         contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
         contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOCUMENTS);
@@ -222,12 +222,12 @@ public class ViewActivity extends AppCompatActivity {
         Uri wordUri = contentResolver.insert(MediaStore.Files.getContentUri("external"), contentValues);
 
         if (wordUri != null) {
-            try (OutputStream out = contentResolver.openOutputStream(wordUri);
+            try (OutputStream out = contentResolver.openOutputStream(wordUri);  //using outputStream to write the text to the word file
                  FileInputStream in = new FileInputStream(wordFile)) {
                 byte[] buffer = new byte[1024];
                 int bytesRead;
-                while ((bytesRead = in.read(buffer)) != -1) {
-                    out.write(buffer, 0, bytesRead);
+                while ((bytesRead = in.read(buffer)) != -1) {  //running th while loop until the complete bytes from the pdf is taken
+                    out.write(buffer, 0, bytesRead);  //writing those byte data in the file
                 }
             } catch (IOException e) {
                 throw new IOException("Error writing to output stream", e);

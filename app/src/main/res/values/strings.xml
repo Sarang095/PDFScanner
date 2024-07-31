@@ -1,3 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">PDFScanner</string>
+    <string name="logo">App Logo</string>
+    <string name="favorites">Favorites</string>
+    <string name="settings">Settings</string>
+    <string name="banner">Banner</string>
+    <string name="smart_scan">Smart Scan</string>
+    <string name="id_card">ID Card</string>
+    <string name="import_files">Import Files</string>
+    <string name="more">More</string>
+    <string name="college_1">College 1</string>
+    <string name="college_2">College 2</string>
+    <string name="college_3">College 3</string>
+    <string name="college_4">College 4</string>
+    <string name="pdf">PDF</string>
+    <string name="more_options">More Options</string>
+    <string name="premium_offer">Premium Offer</string>
+    <string name="benefits">Benefits</string>
+    <string name="free_delivery">Free Delivery</string>
+    <string name="cash_back_offer">Cash Back Offer</string>
+    <string name="off_on_every_order">5% off on every order</string>
+    <string name="premium_offer_desc">₹499/- for 6 Months access</string>
+    <string name="invite_friends">Invite Your Friends</string>
+    <string name="invite_friends_desc">Discover the easiest way to scan, store, and share documents with our new app!</string>
+    <string name="facebook">Facebook</string>
+    <string name="twitter">Twitter</string>
+    <string name="telegram">Telegram</string>
+    <string name="instagram">Instagram</string>
+    <string name="home">Home</string>
+    <string name="scan">Scan</string>
+    <string name="files">Files</string>
+    <string name="profile">Profile</string>
 </resources>

@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private String currentMimeType;
     private Uri imageUri;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +40,17 @@ public class MainActivity extends AppCompatActivity {
         Button WordToPdf = findViewById(R.id.word_to_pdf);
         Button capture = findViewById(R.id.capture);
         Button PDFtoWord =  findViewById(R.id.upload_pdf);
+        Button test_ui = findViewById(R.id.test_ui);
+
+
+        test_ui.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, MainActivity2.class);
+                startActivity(intent);
+            }
+        });
+
 
         ImgToPdf.setOnClickListener(new View.OnClickListener() {
             @Override
